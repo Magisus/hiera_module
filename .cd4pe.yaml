@@ -1,0 +1,34 @@
+config:
+  enable_pull_requests_from_forks: false
+  enable_pe_plans: true
+pipelines:
+  main:
+    triggers:
+    - "COMMIT"
+    stages:
+    - name: "Pipeline Stage 1"
+      steps:
+      - type: "IMPACT_ANALYSIS"
+        deployments:
+        - "Deployment to production on PE1"
+        concurrent_compilations: 10
+        all_deployments: false
+        impact_analysis_hiera_regex: "[^.].*"
+      auto_promote: "all_succeeded"
+    - name: "Deployment stage"
+      steps:
+      - type: "DEPLOYMENT"
+        name: "Deployment to production on PE1"
+        policy:
+          name: "cd4pe_deployments::eventual_consistency"
+        timeout: 3600000
+        concurrent_compilations: 0
+        all_deployments: false
+        pe_server: "PE1"
+        target:
+          type: "NODE_GROUP"
+          node_group_id: "0313a570-610c-46c1-81f5-5ec60c8704b5"
+          control_repo: "control-repo"
+      auto_promote: false
+spec_version: "V1"
+
